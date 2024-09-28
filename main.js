@@ -5,6 +5,8 @@ let model;
 let map;
 let colorScale;
 let countryMapping;
+let currentResult;
+
 
 // Create a mapping between ISO codes and D3 country identifiers
 function createCountryMapping(geoJsonData) {
@@ -325,11 +327,39 @@ function createMap(worldData) {
         .append("path")
         .attr("d", path)
         .attr("fill", "#ccc")
-        .attr("stroke", "#fff");
+        .attr("stroke", "#fff")
+        .on("click", handleCountryClick);
 
     // Set up color scale
     colorScale = d3.scaleSequential(d3.interpolateRdYlGn)
-        .domain([0.95, 1.05]); // Adjust domain based on expected range of GDP changes
+        .domain([-0.05, .05]); // Adjust domain based on expected range of GDP changes
+}
+
+function handleCountryClick(event, d) {
+    const d3Id = d.id;
+    const d3Name = d.properties.name;
+    let isoCode = countryMapping.d3ToIso[d3Id];
+    if (!isoCode) {
+        isoCode = countryMapping.nameToIso[d3Name.toLowerCase()];
+    }
+    const countryIndex = model.countries.indexOf(isoCode);
+    
+    if (countryIndex !== -1 && currentResult) {
+        const gdpChange = currentResult[countryIndex] - 1;
+        displayCountryInfo(d3Name, gdpChange);
+    } else {
+        displayCountryInfo(d3Name, null);
+    }
+}
+
+function displayCountryInfo(countryName, gdpChange) {
+    const infoElement = document.getElementById("country-info");
+    if (gdpChange !== null) {
+        const formattedGdpChange = (gdpChange * 100).toFixed(2);
+        infoElement.textContent = `${countryName}: ${formattedGdpChange}%`;
+    } else {
+        infoElement.textContent = `${countryName}: No data available`;
+    }
 }
 
 function setupSliders() {
@@ -351,7 +381,7 @@ function setupSliders() {
 
 function createColorScale() {
     colorScale = d3.scaleSequential(d3.interpolateRdYlGn)
-        .domain([0.95, 1.05]); // Adjusted domain from -7% to 3%
+        .domain([-0.05, 0.05]); // Adjusted domain from -7% to 3%
 }
 
 function createColorScaleBar() {
@@ -398,7 +428,6 @@ function createColorScaleBar() {
         .style("text-anchor", "middle")
         .text("GDP Change");
 }
-
 function updateVisualization(tariffOthers, tariffChina) {
     console.log("Updating visualization with tariff rates:", 
                 "Others:", tariffOthers, "China:", tariffChina);
@@ -407,9 +436,9 @@ function updateVisualization(tariffOthers, tariffChina) {
     const tariffChinaRate = 1 + tariffChina;
     
     const trumpTariff = model.getTrumpTariff(tariffOthersRate, tariffChinaRate);
-    const result = model.exacthatalgebra(trumpTariff);
+    currentResult = model.exacthatalgebra(trumpTariff);
 
-    console.log("Calculation result:", result);
+    console.log("Calculation result:", currentResult);
 
     let coloredCountries = 0;
     let totalCountries = 0;
@@ -427,7 +456,7 @@ function updateVisualization(tariffOthers, tariffChina) {
         }
         const countryIndex = model.countries.indexOf(isoCode);
         if (countryIndex !== -1) {
-            const gdpChange = result[countryIndex];
+            const gdpChange = currentResult[countryIndex] - 1;
             const color = colorScale(gdpChange);
             console.log(`Country: ${isoCode} (D3 ID: ${d3Id}, Name: ${d3Name}), GDP Change: ${gdpChange}, Color: ${color}`);
             coloredCountries++;
