@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Trade Policy Visualization</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/topojson/3.0.2/topojson.min.js"></script>
+    <script src="onesector.js"></script>
+    <script type="module" src="main.js"></script>
+    <style>
+        #container {
+            display: flex;
+            flex-direction: row;
+            align-items: flex-start;
+            justify-content: center;
+        }
+        #map-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        #map {
+            width: 800px;
+            height: 500px;
+        }
+        #color-scale-bar {
+            margin-left: 20px;
+        }
+        #controls {
+            margin-top: 20px;
+        }
+        .slider-container {
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div id="container">
+        <div id="map-container">
+            <div id="map"></div>
+            <div id="controls">
+                <h2>Policy Controls</h2>
+                <div class="slider-container">
+                    <label for="tariff-others">Tariff for Other Countries (%): </label>
+                    <input type="range" id="tariff-others" min="0" max="100" value="0">
+                    <span id="tariff-others-value">0%</span>
+                </div>
+                <div class="slider-container">
+                    <label for="tariff-china">Tariff for China (%): </label>
+                    <input type="range" id="tariff-china" min="0" max="100" value="0">
+                    <span id="tariff-china-value">0%</span>
+                </div>
+            </div>
+        </div>
+        <div id="color-scale-bar"></div>
+    </div>
+</body>
+</html>

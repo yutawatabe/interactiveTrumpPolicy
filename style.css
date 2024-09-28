@@ -1,0 +1,17 @@
+#container { 
+    display: flex; 
+}
+#map { 
+    flex: 2; 
+}
+#controls { 
+    flex: 1; 
+    padding: 20px; 
+}
+.country { 
+    stroke: #fff; 
+    stroke-width: 0.5px; 
+}
+.country:hover { 
+    opacity: 0.8; 
+}
